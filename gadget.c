@@ -291,7 +291,7 @@ int dwc3_gadget_resize_tx_fifos(struct dwc3 *dwc)
 void dwc3_gadget_giveback(struct dwc3_ep *dep, struct dwc3_request *req,
 		int status)
 {
-	//struct dwc3			*dwc = dep->dwc;
+	struct dwc3	 *dwc = dep->dwc;
 	int				i;
 
 	if (req->queued) {
@@ -848,14 +848,15 @@ static void dwc3_prepare_one_trb(struct dwc3_ep *dep,
 		struct dwc3_request *req, dma_addr_t dma,
 		unsigned length, unsigned last, unsigned chain, unsigned node)
 {
+	//struct dwc3		*dwc = dep->dwc;
 	struct dwc3_trb		*trb;
 
 	trb = &dep->trb_pool[dep->free_slot & DWC3_TRB_MASK];
 
 	if (!req->trb) {
 +		struct dwc3_ep		*dep = req->dep;
-+		if (req->list.next != LIST_POISON1) dwc3_gadget_move_request_queued(req);
-+		req->trb = trb;
+	+		if (req->list.next != LIST_POISON1) dwc3_gadget_move_request_queued(req);
+	+		req->trb = trb;
 		req->trb_dma = dwc3_trb_dma_offset(dep, trb);
 		req->start_slot = dep->free_slot & DWC3_TRB_MASK;
 	}
